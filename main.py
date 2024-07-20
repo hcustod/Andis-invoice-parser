@@ -14,10 +14,10 @@ def parse_pdf(pdf_path):
 def extract_keywords(text, keywords):
     extracted_data = {}
     patterns = {
-        "Invoice number": re.compile(r"Invoice number:?\s*([0-9A-Za-z-]+)", re.IGNORECASE),
-        "Invoice date": re.compile(r"Invoice date:?\s*([A-Za-z0-9, ]+)", re.IGNORECASE),
-        "Subtotal in CAD": re.compile(r"Subtotal in CAD:?\s*([\d,]+\.\d{2})", re.IGNORECASE),
-        "Total in CAD": re.compile(r"Total in CAD:?\s*([\d,]+\.\d{2})", re.IGNORECASE),
+        "Invoice number": re.compile(r"Invoice number[:\s]*([0-9A-Za-z-]+)", re.IGNORECASE),
+        "Invoice date": re.compile(r"Invoice date[:\s]*([A-Za-z0-9, ]+)", re.IGNORECASE),
+        "Subtotal in CAD": re.compile(r"Subtotal in CAD[:\s]*CA?\$?([0-9,]+\.\d{2})", re.IGNORECASE),
+        "Total in CAD": re.compile(r"Total in CAD[:\s]*CA?\$?([0-9,]+\.\d{2})", re.IGNORECASE),
     }
 
     for keyword, pattern in patterns.items():
@@ -33,8 +33,13 @@ def main():
         return
 
     pdf_path = sys.argv[1]
-    keywords = ["Invoice number", "Invoice date", "Subtotal in CAD", "Total in CAD"]
     text = parse_pdf(pdf_path)
+
+    print("Raw Text Extracred from PDF:")
+    print(text) 
+    print("\n")
+
+    keywords = ["Invoice number", "Invoice date", "Subtotal in CAD", "Total in CAD"]
     extracted_data = extract_keywords(text, keywords)
     
     print("Extracted Keywords and Values:")
