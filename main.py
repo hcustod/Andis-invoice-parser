@@ -13,8 +13,14 @@ def parse_pdf(pdf_path):
 
 def extract_keywords(text, keywords):
     extracted_data = {}
-    for keyword in keywords:
-        pattern = re.compile(rf"{keyword}.*?([0-9A-Za-z-]+[,.]?\d*)", re.IGNORECASE)
+    patterns = {
+        "Invoice number": re.compile(r"Invoice number:?\s*([0-9A-Za-z-]+)", re.IGNORECASE),
+        "Invoice date": re.compile(r"Invoice date:?\s*([A-Za-z0-9, ]+)", re.IGNORECASE),
+        "Subtotal in CAD": re.compile(r"Subtotal in CAD:?\s*([\d,]+\.\d{2})", re.IGNORECASE),
+        "Total in CAD": re.compile(r"Total in CAD:?\s*([\d,]+\.\d{2})", re.IGNORECASE),
+    }
+
+    for keyword, pattern in patterns.items():
         match = pattern.search(text)
         if match:
             extracted_data[keyword] = match.group(1).strip()
