@@ -1,6 +1,7 @@
 import fitz
 import re
 import sys
+import argparse
 
 def parse_pdf(pdf_path):
     document = fitz.open(pdf_path)
@@ -15,9 +16,9 @@ def extract_keywords(text, keywords):
     extracted_data = {}
     patterns = {
         "Invoice number": re.compile(r"Invoice number[:\s]*([0-9A-Za-z-]+)", re.IGNORECASE),
-        "Invoice date": re.compile(r"Invoice date[:\s]*([A-Za-z0-9, ]+)", re.IGNORECASE),
-        "Subtotal in CAD": re.compile(r"Subtotal in CAD[:\s]*CA?\$?([0-9,]+\.\d{2})", re.IGNORECASE),
-        "Total in CAD": re.compile(r"Total in CAD[:\s]*CA?\$?([0-9,]+\.\d{2})", re.IGNORECASE),
+        "Invoice date": re.compile(r"([A-Za-z0-9, ]+)\s*Invoice date", re.IGNORECASE),
+        "Subtotal in CAD": re.compile(r"([0-9,]+\.\d{2})\s*Subtotal in CAD", re.IGNORECASE),
+        "Total in CAD": re.compile(r"([0-9,]+\.\d{2})\s*Total in CAD", re.IGNORECASE),
     }
 
     for keyword, pattern in patterns.items():
@@ -28,16 +29,17 @@ def extract_keywords(text, keywords):
 
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python invoice_parser.py <pdf_path>")
-        return
+    parser = argparse.ArgumentParser(description="Extract keywords from PDF invoices.")
+    parser.add_argument("pdf_path", help="Path to the PDF file.")
+    parser.add_argument("--debug", action="store_true", help="Print raw text extracted from the PDF for debugging.")
+    args = parser.parse_args()
 
-    pdf_path = sys.argv[1]
-    text = parse_pdf(pdf_path)
+    text = parse_pdf(args.pdf_path)
 
-    print("Raw Text Extracred from PDF:")
-    print(text) 
-    print("\n")
+    if args.debug:
+        print("Raw Text Extracred from PDF:")
+        print(text) 
+        print("\n")
 
     keywords = ["Invoice number", "Invoice date", "Subtotal in CAD", "Total in CAD"]
     extracted_data = extract_keywords(text, keywords)
